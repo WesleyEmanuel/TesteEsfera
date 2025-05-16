@@ -78,8 +78,8 @@ php artisan serve
 
 | Nome                | Email                  | Senha  | Role     |
 |---------------------|------------------------|--------|----------|
-| Admin Master        | admin@gmail.com        | -      | admin    |
-| User                | user@gmail.com         | -      | employee |
+| Admin Master        | admin@gmail.com        | Password!| admin    |
+| User                | user@gmail.com         | Password!| employee |
 
 **Obs:** As senhas estão criptografadas no banco. Altere via comando ou seed se necessário.
 
