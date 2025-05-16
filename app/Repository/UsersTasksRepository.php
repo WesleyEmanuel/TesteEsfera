@@ -9,4 +9,18 @@ class UsersTasksRepository extends AbstractRepository{
     {
         $this->model = $task;
     }
+
+    public function existingUserTask($task, $user){
+        return $this->model
+            ->where('user_id', $user)
+            ->where('task_id', $task)
+            ->get();
+    }
+
+    public function unlinkUserTask($task, $user){
+        return $this->model
+            ->where('user_id', $user)
+            ->where('task_id', $task)
+            ->delete();
+    }
 }

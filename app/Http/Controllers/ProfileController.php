@@ -3,38 +3,53 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\User;
+use App\Services\UsersService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
-    /**
-     * Display the user's profile form.
-     */
-    public function edit(Request $request): View
+    private $usersService;
+
+    public function __construct(UsersService $usersService) {
+        $this->usersService = $usersService;
+    }
+
+    public function edit(User $user): View
     {
         return view('profile.edit', [
-            'user' => $request->user(),
+            'user' => $user,
         ]);
     }
 
     /**
      * Update the user's profile information.
      */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function update(User $user, Request $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $request->validate([
+            'name' => ['required', 'string', 'min:3', 'max:200'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:200', Rule::unique(User::class)->ignore($user)]
+        ]);
 
         if ($request->user()->isDirty('email')) {
             $request->user()->email_verified_at = null;
         }
 
-        $request->user()->save();
+        $updateUser = [
+            'name' => $request->name,
+            'email' => $request->email,
+            'status' => $request->status
+        ];
 
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+        $this->usersService->updateUser($user->id, $updateUser);
+
+        return Redirect::route('users.index')->with('success', 'Usuário editado com sucesso');
     }
 
     /**

@@ -46,6 +46,8 @@ class RegisteredUserController extends Controller
             'status' => 1, 
         ]);
 
+        dd($user);
+
         event(new Registered($user));
 
         Auth::login($user);

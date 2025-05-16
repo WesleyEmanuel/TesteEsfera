@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Models\User;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -46,6 +47,14 @@ class LoginRequest extends FormRequest
 
             throw ValidationException::withMessages([
                 'email' => trans('auth.failed'),
+            ]);
+        }
+
+        $user = User::where('email', $this->email)->first();
+        // dd($user->status);
+        if ($user->status == 0) {
+            throw ValidationException::withMessages([
+                'email' => __('Sua conta está desativada.'),
             ]);
         }
 

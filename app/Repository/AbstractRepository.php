@@ -17,9 +17,17 @@ abstract class AbstractRepository
     {
         return $this->model->orderBy('created_at', 'desc')->get();
     }
-
-    public function find($id)
+    
+    public function allPaginated()
     {
+        return $this->model->orderBy('created_at', 'desc')->paginate(10);
+    }
+
+    public function find($id, $key = null)
+    {
+        if($key){
+            return $this->model->where($key, $id)->get();
+        }
         return $this->model->find($id);
     }
 

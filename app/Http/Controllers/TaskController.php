@@ -3,22 +3,50 @@
 namespace App\Http\Controllers;
 
 use App\Services\TasksService;
+use App\Services\UsersService;
 use Illuminate\Http\Request;
 
 class TaskController extends Controller
 {
     private $tasksService;
+    private $usersService;
 
-    public function __construct(TasksService $tasksService)
+    public function __construct(TasksService $tasksService, UsersService $usersService)
     {
         $this->tasksService = $tasksService;
+        $this->usersService = $usersService;
     }
 
     public function index()
     {
-        $tasks = $this->tasksService->getAllTasks();
+        $id = auth()->user()->id;
 
-        return view('dashboard', compact('tasks'));
+        if(count(request()->all())){
+            $filters = request()->all();
+            unset($filters['_token']);
+            unset($filters['_method']);
+            unset($filters['page']);
+            
+            if(isset($filters['user']) && $filters['user'] != 'all'){
+                $filters['users_tasks.user_id'] = $filters['user'];
+            }
+
+            if(isset($filters['status']) && $filters['status'] == 'all'){
+                unset($filters['status']);
+            }
+            
+            unset($filters['user']);
+        }
+
+        if(isset($filters)){
+            $tasks = $this->tasksService->filterTasks($filters);
+        } else{
+            $tasks = $this->tasksService->getTasksByUserId($id);
+        }
+        
+        $users = $this->usersService->getAllUsers();
+
+        return view('dashboard', ['tasks' => $tasks, 'users' => $users]);
     }
 
     public function create()
@@ -42,7 +70,7 @@ class TaskController extends Controller
 
         $this->tasksService->createTask($task);
         
-        return redirect()->route('tasks.index')->with('success', 'Task created successfully.');
+        return redirect()->route('tasks.index')->with('success', 'Tarefa criada com sucesso');
     }
 
     public function show(string $id)
@@ -58,7 +86,10 @@ class TaskController extends Controller
             return redirect()->route('tasks.index')->with('error', 'Task not found.');
         }
 
-        return view('tasks.edit', compact('task'));
+        $usersTask = $this->tasksService->getUsersByTaskId($id);
+        $users = $this->usersService->getAllUsers();
+
+        return view('tasks.edit', ['task'=>$task, 'usersTask' => $usersTask, 'users'=>$users]);
     }
 
     public function update(Request $request, string $id)
@@ -77,11 +108,26 @@ class TaskController extends Controller
 
         $this->tasksService->updateTask($id, $task);
 
-        return redirect()->route('tasks.index')->with('success', 'Task updated successfully.');
+        return redirect()->route('tasks.index')->with('success', 'Tarefa atualizada com sucesso');
+    }
+
+    public function userTask(string $taskId, Request $request){
+        $userId = $request->input('users');
+
+        $this->tasksService->linkUserToTaskTask($taskId, $userId);
+
+        return $this->edit($taskId);
+    }
+
+    public function unlinkUserTask($task, $user){
+        $this->tasksService->unlinkUserTask($task, $user);
+
+        return $this->edit($task);
     }
 
     public function destroy(string $id)
     {
-        //
+        $this->tasksService->deleteTask($id);
+        return redirect()->route('tasks.index')->with('success', 'Tarefa deletada com sucesso');
     }
 }

@@ -3,7 +3,7 @@
         <div class="max-w-xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    <form method="POST" action="{{ route('register') }}">
+                    <form method="POST" action="{{ route('users.store') }}">
                         @csrf
                 
                         <!-- Name -->
@@ -18,6 +18,19 @@
                             <x-input-label for="email" :value="__('Email')" />
                             <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
                             <x-input-error :messages="$errors->get('email')" class="mt-2" />
+                        </div>
+
+                        <div class="mt-4">
+                            <x-input-label for="status" :value="__('Status')" />
+                
+                            <x-select id="status" class="block mt-1 w-full"
+                                            name="status"
+                                            required autocomplete="status" >
+                                <option value="1" {{ old('status') == '1' ? 'selected' : '' }}>{{ __('Ativo') }}</option>
+                                <option value="0" {{ old('status') == '0' ? 'selected' : '' }}>{{ __('Inativo') }}</option>                            
+                            </x-select>
+                
+                            <x-input-error :messages="$errors->get('status')" class="mt-2" />
                         </div>
                 
                         <!-- Password -->

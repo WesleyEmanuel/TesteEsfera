@@ -18,7 +18,16 @@ class TasksService{
 
     public function getAllTasks()
     {
-        return $this->tasksRepository->getTasksByUserId(auth()->user()->id);
+        return $this->tasksRepository->all();
+    }
+    
+    public function filterTasks(array $filters)
+    {
+        return $this->tasksRepository->filterTasks($filters);
+    }
+
+    public function getTasksByUserId(string $id){
+        return $this->tasksRepository->getTasksByUserId($id);
     }
 
     public function getTaskById(string $id)
@@ -42,8 +51,32 @@ class TasksService{
         return $response;
     }
 
+    public function getUsersByTaskId(string $id){
+        return $this->tasksRepository->getUsersByTaskId($id);
+    }
+
     public function updateTask(string $id, array $task)
     {
         return $this->tasksRepository->update($id, $task);
+    }
+
+    public function linkUserToTaskTask(string $task, string $user)
+    {
+
+        $existingUserTask = $this->usersTasksRepository->existingUserTask($task, $user);
+        
+        if(count($existingUserTask)){
+            return;
+        }
+            
+        return $this->usersTasksRepository->create(['user_id'=>$user, 'task_id'=>$task]);
+    }
+
+    public function unlinkUserTask($task, $user){
+        return $this->usersTasksRepository->unlinkUserTask($task, $user);
+    }
+
+    public function deleteTask(string $id){
+        return $this->tasksRepository->delete($id);
     }
 }

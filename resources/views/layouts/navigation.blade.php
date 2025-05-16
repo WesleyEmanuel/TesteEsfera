@@ -15,7 +15,7 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('tasks.index')">
                         Tarefas
                     </x-nav-link>
-                    <x-nav-link :href="route('user.register')" :active="request()->routeIs('user.register')">
+                    <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.index')">
                         Usuários
                     </x-nav-link>
                 </div>
@@ -37,8 +37,8 @@
                     </x-slot>
 
                     <x-slot name="content">
-                        <x-dropdown-link :href="route('profile.edit')">
-                            {{ __('Profile') }}
+                        <x-dropdown-link :href="route('profile.edit', auth()->user()->id)">
+                            {{ __('Perfil') }}
                         </x-dropdown-link>
 
                         <!-- Authentication -->
@@ -48,7 +48,7 @@
                             <x-dropdown-link :href="route('logout')"
                                     onclick="event.preventDefault();
                                                 this.closest('form').submit();">
-                                {{ __('Log Out') }}
+                                {{ __('Sair') }}
                             </x-dropdown-link>
                         </form>
                     </x-slot>
@@ -83,7 +83,7 @@
             </div>
 
             <div class="mt-3 space-y-1">
-                <x-responsive-nav-link :href="route('profile.edit')">
+                <x-responsive-nav-link :href="route('profile.edit', auth()->user()->id)">
                     {{ __('Profile') }}
                 </x-responsive-nav-link>
 
