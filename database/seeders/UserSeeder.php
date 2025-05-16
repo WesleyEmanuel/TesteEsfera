@@ -26,6 +26,7 @@ class UserSeeder extends Seeder
                 'name' => 'User',
                 'email' => 'user@gmail.com',
                 'password' => Hash::make('Password!'),
+                'role' => 'employee',
                 'status' => 1,
                 'remember_token' => null
             ],
